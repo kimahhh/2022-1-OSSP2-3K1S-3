@@ -1,0 +1,72 @@
+create table route(
+id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+start_long DOUBLE NOT NULL, 
+start_lati DOUBLE NOT NULL,
+end_long DOUBLE NOT NULL,
+end_lati DOUBLE NOT NULL,
+bus_num VARCHAR(10) NOT NULL,
+bus_start INT NOT NULL,
+bus_end INT NOT NULL,
+s_bike_long DOUBLE,
+s_bike_lati DOUBLE,
+e_bike_long DOUBLE,
+e_bike_lati DOUBLE,
+fs_bike_long DOUBLE,
+fs_bike_lati DOUBLE,
+fe_bike_long DOUBLE,
+fe_bike_lati DOUBLE
+);
+
+create table recommend(
+reco_id INT NOT NULL,
+route_id INT NOT NULL,
+good1 INT,
+good2 INT,
+good3 INT,
+good4 INT,
+-- good5 VARCHAR(100),
+PRIMARY KEY(reco_id),
+FOREIGN KEY(route_id) REFERENCES route(id)
+);
+
+create table not_recommend (
+notre_id INT NOT NULL,
+-- reco_id INT NOT NULL,
+route_id INT NOT NULL,
+bad1 INT,
+bad2 INT,
+bad3 INT,
+bad4 INT,
+-- bad5 VARCHAR(100),
+PRIMARY KEY(notre_id),
+-- FOREIGN KEY(reco_id) REFERENCES recommend(reco_id),
+FOREIGN KEY(route_id) REFERENCES route(id)
+);
+
+create table reco_string (
+string_id INT NOT NULL,
+route_id INT NOT NULL,
+good VARCHAR(255),
+constraint reco_string PRIMARY KEY(string_id, route_id),
+FOREIGN KEY(route_id) REFERENCES route(id)
+);
+
+create table notre_string (
+string_id INT NOT NULL,
+route_id INT NOT NULL,
+bad VARCHAR(255),
+constraint reco_string PRIMARY KEY(string_id, route_id),
+FOREIGN KEY(route_id) REFERENCES route(id)
+);
+
+input_start_lati -- 도착 위도
+input_start_long -- 도착 경도
+input_end_lati -- 도착 위도
+input_end_long -- 도착 경도
+
+SELECT ( 6371 * acos ( cos ( radians(start_lati) ) * cos( radians(input_start_lati) ) * cos( radians(start_long) - radians(input_start_long) ) + sin ( radians(start_lati) ) * sin( radians(input_start_lati) ))) AS distance1, ( 6371 * acos ( cos ( radians(end_lati) ) * cos( radians(input_end_lati) ) * cos( radians(end_long) - radians(input_end_long) ) + sin ( radians(end_lati) ) * sin( radians(input_end_lati) ))) AS distance2, id 
+FROM route 
+HAVING (distance1 <= 0.3 AND distance2 <= 0.3) -- 반경 300m 와 동일할 경우 
+ORDER BY id 
+-- LIMIT 0 , 300;
+
